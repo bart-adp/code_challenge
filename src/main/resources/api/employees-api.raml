@@ -1,0 +1,112 @@
+#%RAML 1.0
+title: Data Inputs
+version: 1.0
+  
+/employee: 
+  post:
+    body: 
+      application/json:
+          example: |
+            {
+              "employee": 
+              {
+                "id": "A007",
+                "first_name": "Jan",
+                "last_name": "Doe"
+              }
+            }
+    description: Design a flow, exposed as an API, that accepts the below Input JSON and provides a response (see Output below) with HTTP Response Code 201.Using a Dataweave function, create a separate flow that triggers the flow from #1 above,capture the response message, and publish a response message for this new flow
+    responses: 
+      201:
+        body: 
+          application/json:
+            example:
+              message: Jan Doe was created successfully. (Employee ID A007) 
+              
+/java_camelCase:
+  post:
+    body: 
+      application/java:
+          example:
+            "first_name, last_name"
+    description: Create a reusable Java function that converts a given string into camelCase and call that function inside Dataweave.
+    responses: 
+      201:
+        body: 
+          application/json:
+            example:
+              message: String converted              
+
+/multiple_41:
+  get:
+    description: Create a flow that joins Input One and Input Two and produce a response in the below JSON format based on matching IDs in each input.
+    responses:
+      200: 
+        body: 
+          application/json:
+            example: |
+                {
+                "employee": [
+                      {
+                          "id": "A007",
+                          "first_name": "Jan",
+                          "last_name": "Doe"
+                      },
+                      {
+                          "id": "A012",
+                          "first_name": "Chris",
+                          "last_name": "Vaste"
+                      }
+                  ]
+                }
+
+/multiple_42:
+  get:
+    description: Create a flow that joins Inputs and produce a response that includes all records from Input One that may not include corresponding records from Input Two.
+    responses:
+      200: 
+        body: 
+          application/json:
+            example: |
+              {
+                "scoreBoard": [
+                    {
+                        "id": "A007",
+                        "subjects": [
+                            "Maths",
+                            "English",
+                            "Arts",
+                            "Drawimgs"
+                        ],
+                        "score": [
+                            80,
+                            75,
+                            89,
+                            100
+                        ]
+                    },
+                    {
+                        "id": " A021",
+                        "subjects": [
+                            "Maths",
+                            "English",
+                            "Arts",
+                            "Drawimgs"
+                        ],
+                        "score": [
+                            90,
+                            87,
+                            77,
+                            95
+                        ]
+                    }
+                ]
+              }
+/uriParam:
+  /{N}:
+    get:
+      description: Create a Mule flow that accepts a number (for ex 10 as a URI Parameter) and produce the following JSON array as an output response
+      responses:
+        200: 
+          body: 
+            application/json:

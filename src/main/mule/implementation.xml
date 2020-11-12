@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<flow name="postEmployee" doc:id="dbd2e30d-ba06-408e-901b-08bf8659f8de" >
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="2ed0e126-0f2d-4583-b7a5-ac48c405e30d">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.employee.first_name ++ ' ' ++ payload.employee.last_name ++ ' was created successfully. (Employee ID: ' ++ payload.employee.id ++ ')']]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="56e48eec-3d60-4a4e-a283-6e4ed98de7fa" />
+	</flow>
+	<flow name="postEmployeeTrigger" doc:id="38e1fe00-a039-4e82-a7a8-132961f10724" >
+		<http:listener doc:name="POST /employee" doc:id="fa3577a8-fec3-4f67-83b1-db202311f556" config-ref="employees-api-httpListenerConfig" path="/employee">
+			<http:response statusCode="201" />
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="9cf28ee8-33d1-42f4-9089-1e3130ca6611" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+lookup("postEmployee",payload)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="87809eff-89de-4163-a465-76a022770508" />
+		<logger level="INFO" doc:name="Logger" doc:id="5a71a7b5-e40b-4593-b749-b63ae797f06a" message="#[payload]"/>
+	</flow>
+	<flow name="java_camelCase" doc:id="fddcb1e8-b69a-4a42-bba8-458dabff89c5" >
+		<ee:transform doc:name="Transform Message" doc:id="0892c049-bed4-4d60-a031-4e860062b4c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import camelize from dw::core::Strings
+output application/java
+fun camelCase(payload) =
+	camelize(payload)
+---
+camelCase(payload)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="postEmployees" doc:id="73439aba-9921-44c4-9424-1de37e760ec8" >
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="691065a6-f8e7-4e09-b81c-30896112e0a7">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var employees = {
+    "employee": [
+        {
+            "id": "A007",
+            "first_name": "Jan",
+            "last_name": "Doe"
+        },
+        {
+            "id": "A008",
+            "first_name": "Ron",
+            "last_name": "David"
+        },
+        {
+            "id": "A009",
+            "first_name": "Jane",
+            "last_name": "Kane"
+        },
+        {
+            "id": "A010",
+            "first_name": "Marsh",
+            "last_name": "Megan"
+        },
+        {
+            "id": "A011",
+            "first_name": "Kelly",
+            "last_name": "Mitch"
+        },
+        {
+            "id": "A012",
+            "first_name": "Chris",
+            "last_name": "Vaste"
+        }
+    ]
+}
+---
+employees]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4a353e9e-a621-4dce-bad0-fe1d6b8c9fcb" message="#[payload]"/>
+	</flow>
+	<flow name="postScoreBoard" doc:id="1b971ce0-bd8c-45e5-b966-6fcf5a341c7d" >
+	<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ba0d272b-4935-4e16-b25f-af85553a8534">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var scoreBoard = {
+    "scoreBoard": [
+        {
+            "id": "A007",
+            "subjects": [
+                "Maths",
+                "English",
+                "Arts",
+                "Drawimgs"
+            ],
+            "score": [
+                80,
+                75,
+                89,
+                100
+            ]
+        },
+        {
+            "id": "A008",
+            "subjects": [
+                "Maths",
+                "English",
+                "Arts",
+                "Drawimgs"
+            ],
+            "score": [
+                70,
+                85,
+                69,
+                90
+            ]
+        },
+        {
+            "id": " A021",
+            "subjects": [
+                "Maths",
+                "English",
+                "Arts",
+                "Drawimgs"
+            ],
+            "score": [
+                90,
+                87,
+                77,
+                95
+            ]
+        }
+    ]
+}
+---
+scoreBoard]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1651e40e-db8d-44fd-aede-75002dd5e03d" message="#[payload]"/>
+	</flow>
+	<flow name="getMultipleInputs4.1" doc:id="fe11bf6a-d7e4-4942-889e-8def17d68426" >
+		<scatter-gather doc:name="Scatter-Gather" doc:id="65fa382d-9413-47b2-a75f-b4df7ea02db7" >
+			<route >
+				<flow-ref doc:name="postEmployees" doc:id="49c374de-35cc-4759-88fb-5bd9ba1e18fa" name="postEmployees"/>
+			</route>
+			<route >
+				<flow-ref doc:name="postScoreBoard" doc:id="b594c21d-60cf-42df-88bf-b4504eef0fd7" name="postScoreBoard"/>
+			</route>
+		</scatter-gather>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="f264ae73-6f1e-4962-a9d1-c2ee379a16f5" />
+		<ee:transform doc:name="Transform Message" doc:id="148e95c1-ddb4-4243-8250-fccca656cd69" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+var employees = payload.'0'.payload.employee
+var scoreBoard = payload.'1'.payload.scoreBoard
+output application/json
+---
+"certificate":
+join(employees, scoreBoard, (e) -> e.id, (s) -> s.id) map (item, index) -> {
+	id: item.l.id,
+	firstName: item.l.first_name,
+	lastName: item.l.last_name,
+	"MarksBySubjectWise": {(item.r.subjects map (value, key) -> {
+				(value): item.r.score[(key)]})
+			}
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="22ea86c3-239f-47e1-8e5f-0e896e19f806" message="#[payload]"/>
+	</flow>
+	<flow name="getMultipleInputs4.2" doc:id="10dda6b8-e26e-42d8-a6d2-6f961fa691c4" >
+		<scatter-gather doc:name="Copy_of_Scatter-Gather" doc:id="fa31982d-bd47-4208-8652-d0eeda33bb06" >
+			<route >
+				<flow-ref doc:name="Copy_of_postEmployees" doc:id="3c1e1d07-6508-47ca-b3a3-75499ddc96a4" name="postEmployees" />
+			</route>
+			<route >
+				<flow-ref doc:name="Copy_of_postScoreBoard" doc:id="bfe76a3c-a5ab-4b60-87d3-943ffb00aa87" name="postScoreBoard" />
+			</route>
+		</scatter-gather>
+		<set-payload value="#[payload]" doc:name="Copy_of_Set Payload" doc:id="28522b1e-3c21-4ba2-8de6-ca2110c9268b" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="c3f91ca4-6924-4796-8fde-d54006767f57" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+using(data = payload."0".payload.*employee map (item, index) -> {
+	(payload."1".payload.*scoreBoard map (item2, index2) -> {
+		id: item..id map (i ,v) -> (i != item2.id[v]): ({id: i}),
+		empl: item
+	})
+})
+
+"certificate": data.id..'true' map (item, index) -> {
+	(data..empl map (item2, index2) -> {
+		(item2 filter ($.id == item.id) map (value, key) -> {
+			id: value.id,
+			firstName: value.first_name,
+			lastName: value.last_name,
+			"MarksBySubjectWise": 
+				{(value..subjects map (i, x) -> {
+					(i): value..score[(x)]})
+				}
+		})
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="1052179f-8b55-49ef-8003-08855810a40c" message="#[payload]" />
+	</flow>
+	<flow name="URIParameter" doc:id="8e7036dc-1ba7-44c1-aecc-e3f23229ebfe" >
+		<set-payload value="#[output application/json
+---
+1 to message.attributes.uriParams.N as Number]" doc:name="Set Payload" doc:id="61c79224-b497-416e-a4f6-fa219b825c4d" />
+		<logger level="INFO" doc:name="Logger" doc:id="5d98dc3b-a1c2-4737-9a02-13d382a7dc80" message="#[payload]"/>
+	</flow>
+</mule>
